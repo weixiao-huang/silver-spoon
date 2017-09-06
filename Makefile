@@ -98,47 +98,47 @@ match = $(shell echo $(2) | $(AWK) '{for(i=1;i<=NF;i++){if(match("$(1)","^"$$(i)
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 # include kernel/user
 
-INCLUDE	+= libs/
+# INCLUDE	+= libs/
 
-CFLAGS	+= $(addprefix -I,$(INCLUDE))
+# CFLAGS	+= $(addprefix -I,$(INCLUDE))
 
-LIBDIR	+= libs
+# LIBDIR	+= libs
 
-$(call add_files_cc,$(call listf_cc,$(LIBDIR)),libs,)
+# $(call add_files_cc,$(call listf_cc,$(LIBDIR)),libs,)
 
-# -------------------------------------------------------------------
-# kernel
+# # -------------------------------------------------------------------
+# # kernel
 
-KINCLUDE	+= kern/debug/ \
-			   kern/driver/ \
-			   kern/trap/ \
-			   kern/mm/
+# KINCLUDE	+= kern/debug/ \
+# 			   kern/driver/ \
+# 			   kern/trap/ \
+# 			   kern/mm/
 
-KSRCDIR		+= kern/init \
-			   kern/libs \
-			   kern/debug \
-			   kern/driver \
-			   kern/trap \
-			   kern/mm
+# KSRCDIR		+= kern/init \
+# 			   kern/libs \
+# 			   kern/debug \
+# 			   kern/driver \
+# 			   kern/trap \
+# 			   kern/mm
 
-KCFLAGS		+= $(addprefix -I,$(KINCLUDE))
+# KCFLAGS		+= $(addprefix -I,$(KINCLUDE))
 
-$(call add_files_cc,$(call listf_cc,$(KSRCDIR)),kernel,$(KCFLAGS))
+# $(call add_files_cc,$(call listf_cc,$(KSRCDIR)),kernel,$(KCFLAGS))
 
-KOBJS	= $(call read_packet,kernel libs)
+# KOBJS	= $(call read_packet,kernel libs)
 
-# create kernel target
-kernel = $(call totarget,kernel)
+# # create kernel target
+# kernel = $(call totarget,kernel)
 
-$(kernel): tools/kernel.ld
+# $(kernel): tools/kernel.ld
 
-$(kernel): $(KOBJS)
-	@echo + ld $@
-	$(V)$(LD) $(LDFLAGS) -T tools/kernel.ld -o $@ $(KOBJS)
-	@$(OBJDUMP) -S $@ > $(call asmfile,kernel)
-	@$(OBJDUMP) -t $@ | $(SED) '1,/SYMBOL TABLE/d; s/ .* / /; /^$$/d' > $(call symfile,kernel)
+# $(kernel): $(KOBJS)
+# 	@echo + ld $@
+# 	$(V)$(LD) $(LDFLAGS) -T tools/kernel.ld -o $@ $(KOBJS)
+# 	@$(OBJDUMP) -S $@ > $(call asmfile,kernel)
+# 	@$(OBJDUMP) -t $@ | $(SED) '1,/SYMBOL TABLE/d; s/ .* / /; /^$$/d' > $(call symfile,kernel)
 
-$(call create_target,kernel)
+# $(call create_target,kernel)
 
 # -------------------------------------------------------------------
 
@@ -167,29 +167,29 @@ $(call create_target_host,sign,sign)
 # -------------------------------------------------------------------
 
 # create ucore.img
-UCOREIMG	:= $(call totarget,ucore.img)
+# UCOREIMG	:= $(call totarget,ucore.img)
 
-$(UCOREIMG): $(kernel) $(bootblock)
-	$(V)dd if=/dev/zero of=$@ count=10000
-	$(V)dd if=$(bootblock) of=$@ conv=notrunc
-	$(V)dd if=$(kernel) of=$@ seek=1 conv=notrunc
+# $(UCOREIMG): $(kernel) $(bootblock)
+# 	$(V)dd if=/dev/zero of=$@ count=10000
+# 	$(V)dd if=$(bootblock) of=$@ conv=notrunc
+# 	$(V)dd if=$(kernel) of=$@ seek=1 conv=notrunc
 
-$(call create_target,ucore.img)
+# $(call create_target,ucore.img)
 
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 $(call finish_all)
 
-IGNORE_ALLDEPS	= clean \
-				  dist-clean \
-				  grade \
-				  touch \
-				  print-.+ \
-				  handin
+# IGNORE_ALLDEPS	= clean \
+# 				  dist-clean \
+# 				  grade \
+# 				  touch \
+# 				  print-.+ \
+# 				  handin
 
-ifeq ($(call match,$(MAKECMDGOALS),$(IGNORE_ALLDEPS)),0)
--include $(ALLDEPS)
-endif
+# ifeq ($(call match,$(MAKECMDGOALS),$(IGNORE_ALLDEPS)),0)
+# -include $(ALLDEPS)
+# endif
 
 # files for grade script
 
@@ -197,55 +197,55 @@ TARGETS: $(TARGETS)
 all: $(TARGETS)
 .DEFAULT_GOAL := TARGETS
 
-.PHONY: qemu qemu-nox debug debug-nox
-lab1-mon: $(UCOREIMG)
-	$(V)$(TERMINAL) -e "$(QEMU) -S -s -d in_asm -D $(BINDIR)/q.log -monitor stdio -hda $< -serial null"
-	$(V)sleep 2
-	$(V)$(TERMINAL) -e "gdb -q -x tools/lab1init"
-debug-mon: $(UCOREIMG)
-#	$(V)$(QEMU) -S -s -monitor stdio -hda $< -serial null &
-	$(V)$(TERMINAL) -e "$(QEMU) -S -s -monitor stdio -hda $< -serial null"
-	$(V)sleep 2
-	$(V)$(TERMINAL) -e "gdb -q -x tools/moninit"
-qemu-mon: $(UCOREIMG)
-	$(V)$(QEMU) -monitor stdio -hda $< -serial null
-qemu: $(UCOREIMG)
-	$(V)$(QEMU) -parallel stdio -hda $< -serial null
+# .PHONY: qemu qemu-nox debug debug-nox
+# lab1-mon: $(UCOREIMG)
+# 	$(V)$(TERMINAL) -e "$(QEMU) -S -s -d in_asm -D $(BINDIR)/q.log -monitor stdio -hda $< -serial null"
+# 	$(V)sleep 2
+# 	$(V)$(TERMINAL) -e "gdb -q -x tools/lab1init"
+# debug-mon: $(UCOREIMG)
+# #	$(V)$(QEMU) -S -s -monitor stdio -hda $< -serial null &
+# 	$(V)$(TERMINAL) -e "$(QEMU) -S -s -monitor stdio -hda $< -serial null"
+# 	$(V)sleep 2
+# 	$(V)$(TERMINAL) -e "gdb -q -x tools/moninit"
+# qemu-mon: $(UCOREIMG)
+# 	$(V)$(QEMU) -monitor stdio -hda $< -serial null
+# qemu: $(UCOREIMG)
+# 	$(V)$(QEMU) -parallel stdio -hda $< -serial null
 
-qemu-nox: $(UCOREIMG)
-	$(V)$(QEMU) -serial mon:stdio -hda $< -nographic
-TERMINAL        :=gnome-terminal
-gdb: $(UCOREIMG)
-	$(V)$(QEMU) -S -s -parallel stdio -hda $< -serial null
-debug: $(UCOREIMG)
-	$(V)$(QEMU) -S -s -parallel stdio -hda $< -serial null &
-	$(V)sleep 2
-	$(V)$(TERMINAL)  -e "cgdb -q -x tools/gdbinit"
+# qemu-nox: $(UCOREIMG)
+# 	$(V)$(QEMU) -serial mon:stdio -hda $< -nographic
+# TERMINAL        :=gnome-terminal
+# gdb: $(UCOREIMG)
+# 	$(V)$(QEMU) -S -s -parallel stdio -hda $< -serial null
+# debug: $(UCOREIMG)
+# 	$(V)$(QEMU) -S -s -parallel stdio -hda $< -serial null &
+# 	$(V)sleep 2
+# 	$(V)$(TERMINAL)  -e "cgdb -q -x tools/gdbinit"
 	
-debug-nox: $(UCOREIMG)
-	$(V)$(QEMU) -S -s -serial mon:stdio -hda $< -nographic &
-	$(V)sleep 2
-	$(V)$(TERMINAL) -e "gdb -q -x tools/gdbinit"
+# debug-nox: $(UCOREIMG)
+# 	$(V)$(QEMU) -S -s -serial mon:stdio -hda $< -nographic &
+# 	$(V)sleep 2
+# 	$(V)$(TERMINAL) -e "gdb -q -x tools/gdbinit"
 
-.PHONY: grade touch
+# .PHONY: grade touch
 
-GRADE_GDB_IN	:= .gdb.in
-GRADE_QEMU_OUT	:= .qemu.out
-HANDIN			:= proj$(PROJ)-handin.tar.gz
+# GRADE_GDB_IN	:= .gdb.in
+# GRADE_QEMU_OUT	:= .qemu.out
+# HANDIN			:= proj$(PROJ)-handin.tar.gz
 
-TOUCH_FILES		:= kern/trap/trap.c
+# TOUCH_FILES		:= kern/trap/trap.c
 
-MAKEOPTS		:= --quiet --no-print-directory
+# MAKEOPTS		:= --quiet --no-print-directory
 
-grade:
-	$(V)$(MAKE) $(MAKEOPTS) clean
-	$(V)$(SH) tools/grade.sh
+# grade:
+# 	$(V)$(MAKE) $(MAKEOPTS) clean
+# 	$(V)$(SH) tools/grade.sh
 
-touch:
-	$(V)$(foreach f,$(TOUCH_FILES),$(TOUCH) $(f))
+# touch:
+# 	$(V)$(foreach f,$(TOUCH_FILES),$(TOUCH) $(f))
 
-print-%:
-	@echo $($(shell echo $(patsubst print-%,%,$@) | $(TR) [a-z] [A-Z]))
+# print-%:
+# 	@echo $($(shell echo $(patsubst print-%,%,$@) | $(TR) [a-z] [A-Z]))
 
 .PHONY: clean dist-clean handin packall
 clean:

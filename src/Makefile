@@ -22,17 +22,17 @@ GCCPREFIX := $(shell if i386-elf-objdump -i 2>&1 | grep '^elf32-i386$$' >/dev/nu
 endif
 
 # try to infer the correct QEMU
-# ifndef QEMU
-# QEMU := $(shell if which qemu-system-i386 > /dev/null; \
-# 	then echo 'qemu-system-i386'; exit; \
-# 	elif which i386-elf-qemu > /dev/null; \
-# 	then echo 'i386-elf-qemu'; exit; \
-# 	else \
-# 	echo "***" 1>&2; \
-# 	echo "*** Error: Couldn't find a working QEMU executable." 1>&2; \
-# 	echo "*** Is the directory containing the qemu binary in your PATH" 1>&2; \
-# 	echo "***" 1>&2; exit 1; fi)
-# endif
+ifndef QEMU
+QEMU := $(shell if which qemu-system-i386 > /dev/null; \
+	then echo 'qemu-system-i386'; exit; \
+	elif which i386-elf-qemu > /dev/null; \
+	then echo 'i386-elf-qemu'; exit; \
+	else \
+	echo "***" 1>&2; \
+	echo "*** Error: Couldn't find a working QEMU executable." 1>&2; \
+	echo "*** Is the directory containing the qemu binary in your PATH" 1>&2; \
+	echo "***" 1>&2; exit 1; fi)
+endif
 
 # eliminate default suffix rules
 .SUFFIXES: .c .S .h

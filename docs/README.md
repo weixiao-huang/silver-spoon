@@ -54,6 +54,15 @@ In the XQuartz preferences, go to the “Security” tab and make sure you’ve 
 
 ![xquartz_preferences](./img/xquartz_preferences.png)
 
+The last work is to allow xhost access to localhost as below:
+
+```
+$ xhost + localhost
+localhost being added to access control list
+```
+
+
+
 ### Windows
 
 You will need to install an X server for Windows. I went for [Vcxsrv](https://sourceforge.net/projects/vcxsrv/) and [Xming](https://sourceforge.net/projects/xming/). The `DISPLAY` environment variable points by default to 10.0.75.1:0.0. If you use docker on Windows 10, this should be ok.

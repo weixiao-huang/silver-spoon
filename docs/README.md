@@ -29,7 +29,7 @@ Open the Preferences of Docker for Mac, make sure your projects' root folder is 
 
 ### Linux
 
-There's no need to do any thing.
+You'll need to allow the xhost access by using `xhost + loacl:root`
 
 ### MacOS
 

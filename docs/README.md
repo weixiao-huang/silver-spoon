@@ -84,6 +84,18 @@ you can enter the container. So the environment is ok, you can use this as a vir
 
 By detach the container, just type `exit`. While you want to go back into the container, also type `make exec`.
 
+For stop the container for removing it, just type
+
+```
+$ make stop
+```
+
+For remove the `ucore-container` to initial a new `ucore-container`, just type
+
+```
+$ make rm
+```
+
 That's it, so concise and elegant.
 
 ## References

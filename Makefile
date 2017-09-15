@@ -6,8 +6,6 @@ NETWORK    := ucore-net
 WORKDIR	   := /usr/src/app
 
 VOLFLAGS   := -v $(CURDIR)/$(SOURCE):$(WORKDIR)
-# NETFLAGS   := --net=host
-# PORTFLAGS  := -p 5522:22
 
 BASH       := /bin/bash
 QEMU       := qemu
@@ -16,8 +14,13 @@ GDB        := gdb
 GDBINIT    := tools/gdbinit
 GDBFLAGS   := -q -x $(GDBINIT)
 
+# The default dockerNAT for windows
+# you can change it in docker for windows Application
+WIN_DOCKERNAT := 10.0.75.1
+
+# Get the LOCALIP for DISPLAY in docker
 ifeq ($(OS),Windows_NT)
-	LOCALIP := 10.0.75.1
+	LOCALIP := $(WIN_DOCKERNAT)
 else
     UNAME_S := $(shell uname -s)
     ifeq ($(UNAME_S),Linux)
@@ -27,6 +30,7 @@ else
 		LOCALIP := docker.for.mac.localhost
     endif
 endif
+
 
 DFLAGS     := --privileged -itd $(VOLFLAGS)
 DFLAGS_G   := $(DFLAGS) -e DISPLAY=$(LOCALIP):0 -v /tmp/.X11-unix:/tmp/.X11-unix
@@ -41,15 +45,6 @@ docker_bash = $(docker_run) $(BASH) -c "$(1)"
 exec:
 	@$(docker_exec) $(BASH)
 
-# https://fredrikaverpil.github.io/2016/07/31/docker-for-mac-and-gui-applications/
-config:
-	xhost + $(LOCALIP)
-
-config-cygwin:
-	export DISPLAY=$(LOCALIP)
-	startxwin -- -listen tcp &
-	xhost + $(LOCALIP)
-
 # main
 init: build run
 
@@ -57,7 +52,6 @@ build:
 	docker build -t $(IMAGE) .
 
 run:
-	sh ./launch.sh
 	$(call docker_run_graphics) $(BASH)
 
 start:

@@ -1,5 +1,4 @@
-
-SOURCE     := code
+SOURCE     := src
 IMAGE      := ucore
 CONTAINER  := ucore-container
 NETWORK    := ucore-net

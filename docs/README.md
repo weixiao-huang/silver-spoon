@@ -4,11 +4,17 @@
 
 ### Download and install docker
 
-Follow the Guide of [docker official website](www.docker.com) to get docker for your own operating system. If you are in China, this method is not good because of GFW. So enter [Daocloud Docker Download Channel](http://get.daocloud.io), you can find a better way to download docker.
+#### Official Website
 
-**Tips: **
+Follow the Guide of [docker official website](http://www.docker.com) to get docker for your own operating system.
 
-- be sure to use China docker mirror to accelerate docker while you are in docker, more details can see [here](https://www.daocloud.io/mirror). For using docker accelerator, you need to sign up an account. However, it's worth it since the accelerator is free forever after your signing up.
+#### For China Region
+
+However, if you are in China, downloading from official website is NOT A GOOD WAY because of GFW. A much more recommended method is to use [Daocloud Docker Download Channel](http://get.daocloud.io).
+
+*Attention: *
+
+- Be sure to use China docker mirror to accelerate docker while you are in China region, more details can see [Daocloud Docker Accecelerator](https://www.daocloud.io/mirror). For using docker accelerator, you need to sign up an account in daocloud's website. However, it's worth it since the accelerator is free forever after your signing up.
 - Your version of  Docker for Mac must higher then 17.06
 
 ### Volume configuration for docker in Windows and MacOS
@@ -21,9 +27,11 @@ Open the Settings of Docker for Windows, go to 'Shared Drives' tab, make sure yo
 
 #### MacOS
 
-Open the Preferences of Docker for Mac, make sure your projects' root folder is in the File sharing list as below:
+Open the Preferences of Docker for Mac, make sure your projects' root folder and `/tmp` are both in the File sharing list as below:
 
 <img src="./img/file-sharing-mac.png" style="width: 60%;"/>
+
+
 
 ## Prerequirements
 
@@ -61,7 +69,14 @@ $ xhost + localhost
 localhost being added to access control list
 ```
 
+After doing this, type `xhost`, you will see the display below, which means the settings is successful:
 
+```
+$ xhost
+access control enabled, only authorized clients can connect
+INET:localhost
+INET6:localhost
+```
 
 ### Windows
 
@@ -73,7 +88,9 @@ after fully installing Xming, open `XLaunch.exe`, follow the default steps until
 
 <img src="./img/xming.png" style="width: 60%" />
 
-## Use
+
+
+## How to use
 
 ### Initial
 Firstly, you should build `ucore` image and run `ucore-container` container by using
@@ -124,6 +141,38 @@ $ make rm
 Make sure the container is stopped while you will remove it.
 
 That's it, so concise and elegant.
+
+
+
+## Some Errors
+
+#### 1.File Sharing
+
+```
+docker: Ersror response from daemon: Mounts denied: 
+The path /tmp/.X11-unix
+is not shared from OS X and is not known to Docker.
+You can configure shared paths from Docker -> Preferences... -> File Sharing.
+See https://docs.docker.com/docker-for-mac/osxfs/#namespaces for more info.
+```
+
+You must add `/tmp` into your docker for mac's file sharing list.
+
+#### 2. container rebuild and rerun. 
+
+```
+docker: Error response from daemon: Conflict. The container name "/ucore-container" is already in use by container "4d4dc78559918c49be1347cdfccddc600ea30f0eae11273fb079b8370a251a13". You have to remove (or rename) that container to be able to reuse that name.
+```
+
+This error means the container is already in use, there's no need to `make init` or `make run`, just `make` to attach the container. If you really want to use `make init`, firstly you should stop the container by using `make stop`, then remove it by using `make rm`.
+
+
+
+## Acknowledgements
+
+Thanks for the testing of Cheng Lu and [Yifan Qiao](https://github.com/LegaDyan).
+
+
 
 ## References
 

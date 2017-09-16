@@ -8,11 +8,6 @@ VOLFLAGS   := -v $(CURDIR)/$(SOURCE):$(WORKDIR)
 GVOLFLAGS  := -v /tmp/.X11-unix:/tmp/.X11-unix
 
 BASH       := /bin/bash
-QEMU       := qemu
-QEMUFLAGS  := -s -S
-GDB        := gdb
-GDBINIT    := tools/gdbinit
-GDBFLAGS   := -q -x $(GDBINIT)
 
 # The default dockerNAT for windows
 # you can change it in docker for windows Application
@@ -62,13 +57,9 @@ stop:
 rm:
 	@docker rm $(CONTAINER)
 
-# Code for debug
-debug-qemu:
-	@$(docker_exec) $(QEMU) $(QEMUFLAGS) bin/bootblock
-
-debug-gdb:
-	@$(docker_exec) $(GDB) $(GDBFLAGS)
-
 # extra inner copy
+qemu:
+	@$(docker_exec) make qemu
+
 clean:
 	@$(call docker_bash,make clean)

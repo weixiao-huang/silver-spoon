@@ -17,13 +17,13 @@ Follow the Guide of [docker official website](www.docker.com) to get docker for 
 
 Open the Settings of Docker for Windows, go to 'Shared Drives' tab, make sure your projects' root drive is in the shared drives list as below:
 
-![shared-drives-windows](./img/shared-drives-windows.png)
+<img src="./img/shared-drives-windows.png" style="width: 60%" />
 
 #### MacOS
 
 Open the Preferences of Docker for Mac, make sure your projects' root folder is in the File sharing list as below:
 
-![file-sharing-mac](./img/file-sharing-mac.png)
+<img src="./img/file-sharing-mac.png" style="width: 60%;"/>
 
 ## Prerequirements
 
@@ -52,7 +52,7 @@ open -a XQuartz
 
 In the XQuartz preferences, go to the “Security” tab and make sure you’ve got “Allow connections from network clients” ticked:
 
-![xquartz_preferences](./img/xquartz_preferences.png)
+<img src="./img/xquartz_preferences.png" style="width: 80%;"/>
 
 The last work is to allow xhost access to localhost as below:
 
@@ -71,39 +71,57 @@ I found Xming has better performance than Vcxsrv, so next is a tutorial of Xming
 
 after fully installing Xming, open `XLaunch.exe`, follow the default steps until the 'Specify parameter settings'. You should choose 'No Access Control' as below:
 
-![xming](./img/xming.png)
+<img src="./img/xming.png" style="width: 60%" />
 
 ## Use
 
+### Initial
 Firstly, you should build `ucore` image and run `ucore-container` container by using
 
 ```
 $ make init
 ```
 
+This operation can only be used once unless you change the `Dockerfile`.
+
 use `docker ps` you can see a docker container called `ucore-container`.
 
-use
+### Attach
+
+You'll use
 
 ```
 $ make exec
 ```
 
-you can enter the container. So the environment is ok, you can use this as a virtual machine to develop and test ucore_os.
+to attach and enter the container. So the environment is ok, you can use this as a virtual machine to develop and test ucore_os.
 
 By detach the container, just type `exit`. While you want to go back into the container, also type `make exec`.
 
-For stop the container for removing it, just type
+
+### Start and stop
+
+After `make init`, the `ucore-container` container has been established and will persist until you call `make rm` to remove the container. Even if you shut off your computer, the container is also existed. After your restarting you computer, by attaching the container, you need firstly to start it by using
+
+```
+$ make start
+```
+
+For stopping the container, just type
 
 ```
 $ make stop
 ```
 
-For remove the `ucore-container` to initial a new `ucore-container`, just type
+### Remove the container
+
+For removing the `ucore-container` to initial a new `ucore-container`, just type
 
 ```
 $ make rm
 ```
+
+Make sure the container is stopped while you will remove it.
 
 That's it, so concise and elegant.
 

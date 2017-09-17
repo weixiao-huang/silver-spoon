@@ -22,16 +22,17 @@ endif
 
 # try to infer the correct QEMU
 ifndef QEMU
-QEMU := $(shell if which qemu > /dev/null; \
-	then echo 'qemu'; exit; \
-	elif which i386-ucore-elf-qemu > /dev/null; \
-	then echo 'i386-ucore-elf-qemu'; exit; \
+QEMU := $(shell if which qemu-system-i386 > /dev/null; \
+	then echo 'qemu-system-i386'; exit; \
+	elif which i386-elf-qemu > /dev/null; \
+	then echo 'i386-elf-qemu'; exit; \
 	else \
 	echo "***" 1>&2; \
 	echo "*** Error: Couldn't find a working QEMU executable." 1>&2; \
 	echo "*** Is the directory containing the qemu binary in your PATH" 1>&2; \
 	echo "***" 1>&2; exit 1; fi)
 endif
+
 
 # eliminate default suffix rules
 .SUFFIXES: .c .S .h

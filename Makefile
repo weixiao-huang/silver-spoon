@@ -1,19 +1,24 @@
+#--------------------------------------------------------------------
+# User Editable Interface
+#--------------------------------------------------------------------
+
+# Dir mapped into docker container
 SOURCE     := src
+
+# Docker image name
 IMAGE      := ucore
+
+# Docker container name
 CONTAINER  := ucore-container
-NETWORK    := ucore-net
-WORKDIR	   := /usr/src/app
 
-VOLFLAGS   := -v $(CURDIR)/$(SOURCE):$(WORKDIR)
-GVOLFLAGS  := -v /tmp/.X11-unix:/tmp/.X11-unix
 
-BASH       := /bin/bash
+#--------------------------------------------------------------------
+# Get the LOCALIP of host for DISPLAY of different OS
+#--------------------------------------------------------------------
 
-# The default dockerNAT for windows
-# you can change it in docker for windows Application
-
-# Get the LOCALIP for DISPLAY in docker
 ifeq ($(OS),Windows_NT)
+#   The default dockerNAT for windows is 10.0.75.1
+#   you can change it in docker for windows Application
 	WIN_DOCKERNAT := 10.0.75.1
 	LOCALIP := $(WIN_DOCKERNAT)
 else
@@ -26,6 +31,26 @@ else
 	endif
 endif
 
+
+#--------------------------------------------------------------------
+# Docker flags and container settings
+#--------------------------------------------------------------------
+
+# container's work dir
+WORKDIR	   := /usr/src/app
+
+# map SOURCE into WORKDIR
+VOLFLAGS   := -v $(CURDIR)/$(SOURCE):$(WORKDIR)
+
+# map X11-unix dir
+GVOLFLAGS  := -v /tmp/.X11-unix:/tmp/.X11-unix
+
+# Bash in container
+BASH       := /bin/bash
+
+V          := @
+
+
 DFLAGS     := --privileged -itd $(VOLFLAGS)
 DFLAGS_G   := $(DFLAGS) -e DISPLAY=$(LOCALIP):0 $(GVOLFLAGS)
 
@@ -33,33 +58,42 @@ docker_run          = docker run $(DFLAGS) --name $(CONTAINER) $(IMAGE)
 docker_run_graphics = docker run $(DFLAGS_G) --name $(CONTAINER) $(IMAGE)
 docker_exec         = docker exec -it $(CONTAINER)
 
-docker_bash = $(docker_run) $(BASH) -c "$(1)"
+# docker_bash = $(docker_run) $(BASH) -c "$(1)"
 
-# Get the Ubuntu environment
+
+# >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+# Make Tasks
+# >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+# Get the Ubuntu develop environment
 exec:
-	@$(docker_exec) $(BASH)
+	$(V)$(docker_exec) $(BASH)
 
-# main
+
+# Main tasks
 init: build run
 
 build:
-	docker build -t $(IMAGE) .
+	$(V)docker build -t $(IMAGE) .
 
 run:
-	$(call docker_run_graphics) $(BASH)
+	$(V)$(docker_run_graphics) $(BASH)
 
 start:
-	@docker start $(CONTAINER)
+	$(V)docker start $(CONTAINER)
 
 stop:
-	@docker stop $(CONTAINER)
+	$(V)docker stop $(CONTAINER)
 
 rm:
-	@docker rm $(CONTAINER)
+	$(V)docker rm $(CONTAINER)
 
-# extra inner copy
+
+# Container make command copies
 qemu:
-	@$(docker_exec) make qemu
+	$(V)$(docker_exec) make qemu
 
 clean:
-	@$(call docker_bash,make clean)
+	$(V)$(docker_exec) make clean
+
+# ...

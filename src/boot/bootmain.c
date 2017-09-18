@@ -7,57 +7,58 @@
 // #define COM_LSR         5           // In:  Line Status Register
 // #define COM_LSR_TXRDY   20          // Transmit buffer avail
 
-#define LPTPORT         0x378
-#define CRTPORT         0x3D4
+// #define LPTPORT         0x378
+// #define CRTPORT         0x3D4
+
 #define SECTSIZE        512
 #define ELFHDR          ((struct elfhdr *)0x10000)  // scratch space
 
-static uint16_t *crt = (uint16_t *) 0xB8000;        // CGA memory
+// static uint16_t *crt = (uint16_t *) 0xB8000;        // CGA memory
 
 /* stupid I/O delay routine necessitated by historical PC design flaws */
-static void
-delay(void) {
-    inb(0x84);
-    inb(0x84);
-    inb(0x84);
-    inb(0x84);
-}
+// static void
+// delay(void) {
+//     inb(0x84);
+//     inb(0x84);
+//     inb(0x84);
+//     inb(0x84);
+// }
 
 /* lpt_putc - copy console output to parallel port */
-static void
-lpt_putc(int c) {
-    int i;
-    for (i = 0; !(inb(LPTPORT + 1) & 0x80) && i < 12800; i ++) {
-        delay();
-    }
-    outb(LPTPORT + 0, c);
-    outb(LPTPORT + 2, 0x08 | 0x04 | 0x01);
-    outb(LPTPORT + 2, 0x08);
-}
+// static void
+// lpt_putc(int c) {
+//     int i;
+//     for (i = 0; !(inb(LPTPORT + 1) & 0x80) && i < 12800; i ++) {
+//         delay();
+//     }
+//     outb(LPTPORT + 0, c);
+//     outb(LPTPORT + 2, 0x08 | 0x04 | 0x01);
+//     outb(LPTPORT + 2, 0x08);
+// }
 
 /* cga_putc - print character to console */
-static void
-cga_putc(int c) {
-    int pos;
+// static void
+// cga_putc(int c) {
+//     int pos;
 
-    // cursor position: col + 80*row.
-    outb(CRTPORT, 14);
-    pos = inb(CRTPORT + 1) << 8;
-    outb(CRTPORT, 15);
-    pos |= inb(CRTPORT + 1);
+//     // cursor position: col + 80*row.
+//     outb(CRTPORT, 14);
+//     pos = inb(CRTPORT + 1) << 8;
+//     outb(CRTPORT, 15);
+//     pos |= inb(CRTPORT + 1);
 
-    if (c == '\n') {
-        pos += 80 - pos % 80;
-    }
-    else {
-        crt[pos ++] = (c & 0xff) | 0x0700;
-    }
+//     if (c == '\n') {
+//         pos += 80 - pos % 80;
+//     }
+//     else {
+//         crt[pos ++] = (c & 0xff) | 0x0700;
+//     }
 
-    outb(CRTPORT, 14);
-    outb(CRTPORT + 1, pos >> 8);
-    outb(CRTPORT, 15);
-    outb(CRTPORT + 1, pos);
-}
+//     outb(CRTPORT, 14);
+//     outb(CRTPORT + 1, pos >> 8);
+//     outb(CRTPORT, 15);
+//     outb(CRTPORT + 1, pos);
+// }
 
 /* serial_putc - copy console output to serial port */
 // static void
@@ -70,12 +71,12 @@ cga_putc(int c) {
 // }
 
 /* cons_putc - print a single character to console*/
-static void
-cons_putc(int c) {
-    lpt_putc(c);
-    cga_putc(c);
-    // serial_putc(c);
-}
+// static void
+// cons_putc(int c) {
+//     lpt_putc(c);
+//     cga_putc(c);
+//     // serial_putc(c);
+// }
 
 /* cons_puts - print a string to console */
 // static void
@@ -128,11 +129,19 @@ bootmain(void) {
 
     if (ELFHDR->e_magic != ELF_MAGIC) goto bad;
 
-    cons_putc('B');
-    while (1);
+    struct proghdr *ph, *eph;
+
+    ph = (struct proghdr *)((uintptr_t)ELFHDR + ELFHDR->e_phoff);
+    eph = ph + ELFHDR->e_phnum;
+    for (; ph < eph; ph++)
+        readseg(ph->p_va & 0xFFFFFF, ph->p_memsz, ph->p_offset);
+    
+    ((void (*)(void))(ELFHDR->e_entry & 0xFFFFFF))();
+
+    // cons_putc('B');
+    // while (1);
 
 bad:
-    cons_putc('E');
     outw(0x8A00, 0x8A00);
     outw(0x8A00, 0x8E00);
     /* do nothing */

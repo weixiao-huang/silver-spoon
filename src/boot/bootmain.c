@@ -1,12 +1,16 @@
 #include <types.h>
 #include <x86.h>
+#include <elf.h>
 
-#define COM1            0x3F8
-#define CRTPORT         0x3D4
+// #define COM1            0x3F8
+// #define COM_TX          0           // Out: Transmit buffer (DLAB=0)
+// #define COM_LSR         5           // In:  Line Status Register
+// #define COM_LSR_TXRDY   20          // Transmit buffer avail
+
 #define LPTPORT         0x378
-#define COM_TX          0           // Out: Transmit buffer (DLAB=0)
-#define COM_LSR         5           // In:  Line Status Register
-#define COM_LSR_TXRDY   20          // Transmit buffer avail
+#define CRTPORT         0x3D4
+#define SECTSIZE        512
+#define ELFHDR          ((struct elfhdr *)0x10000)  // scratch space
 
 static uint16_t *crt = (uint16_t *) 0xB8000;        // CGA memory
 
@@ -56,36 +60,81 @@ cga_putc(int c) {
 }
 
 /* serial_putc - copy console output to serial port */
-static void
-serial_putc(int c) {
-    int i;
-    for (i = 0; !(inb(COM1 + COM_LSR) & COM_LSR_TXRDY) && i < 12800; i ++) {
-        delay();
-    }
-    outb(COM1 + COM_TX, c);
-}
+// static void
+// serial_putc(int c) {
+//     int i;
+//     for (i = 0; !(inb(COM1 + COM_LSR) & COM_LSR_TXRDY) && i < 12800; i ++) {
+//         delay();
+//     }
+//     outb(COM1 + COM_TX, c);
+// }
 
 /* cons_putc - print a single character to console*/
 static void
 cons_putc(int c) {
     lpt_putc(c);
     cga_putc(c);
-    serial_putc(c);
+    // serial_putc(c);
 }
 
 /* cons_puts - print a string to console */
+// static void
+// cons_puts(const char *str) {
+//     while (*str != '\0') {
+//         cons_putc(*str ++);
+//     }
+// }
+
 static void
-cons_puts(const char *str) {
-    while (*str != '\0') {
-        cons_putc(*str ++);
-    }
+waitdisk(void) {
+    while ((inb(0x1F7) & 0xC0) != 0x40);
+}
+
+static void
+readsect(void *dst, uint32_t secno) {
+    waitdisk();
+
+    outb(0x1F2, 1);                             // count = 1
+    outb(0x1F3, secno & 0xFF);
+    outb(0x1F4, (secno >> 8) & 0xFF);
+    outb(0x1F5, (secno >> 16) & 0xFF);
+    outb(0x1F6, ((secno >> 24) & 0xF) | 0xE0);
+    outb(0x1F7, 0x20);                          // cmd 0x20 - read sectors
+
+    waitdisk();
+
+    insl(0x1F0, dst, SECTSIZE / 4);
+}
+
+static void
+readseg(uintptr_t va, uint32_t count, uint32_t offset) {
+    uintptr_t end_va = va + count;
+
+    // round down to sector boundary
+    va -= offset % SECTSIZE;
+
+    uint32_t secno = (offset / SECTSIZE) + 1;
+
+    for (; va < end_va; va += SECTSIZE, secno++)
+        readsect((void*)(va), secno);
 }
 
 /* bootmain - the entry of bootloader */
 void
 bootmain(void) {
-    cons_puts("This is a bootloader: Hello world!!");
+    // cons_puts("This is a bootloader: Hello world!!");
+    // read the 1st page off disk
+    readseg((uintptr_t)ELFHDR, SECTSIZE * 8, 0);
 
+    if (ELFHDR->e_magic != ELF_MAGIC) goto bad;
+
+    cons_putc('B');
+    while (1);
+
+bad:
+    cons_putc('E');
+    outw(0x8A00, 0x8A00);
+    outw(0x8A00, 0x8E00);
     /* do nothing */
     while (1);
 }

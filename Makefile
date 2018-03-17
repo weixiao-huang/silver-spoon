@@ -3,7 +3,7 @@
 #--------------------------------------------------------------------
 
 # Dir mapped into docker container
-SOURCE     := src
+SOURCE     := .
 
 # Docker image name
 IMAGE      := ucore

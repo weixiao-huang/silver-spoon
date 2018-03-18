@@ -37,13 +37,17 @@ Open the Preferences of Docker for Mac, make sure your projects' root folder and
 
 ### Linux
 
-You'll need to allow the xhost access by using `xhost + loacl:root`
+You'll need to allow the xhost access by using 
+
+```Bash
+$ xhost + local:root
+```
 
 ### MacOS
 
 For receive X11 forwarding, You’ll need [XQuartz](https://www.xquartz.org/), and normally you would probably install it via [brew](http://brew.sh/) (but not this time):
 
-```
+```Bash
 $ brew cask install xquartz
 ```
 
@@ -53,9 +57,8 @@ After installing XQuartz, log out and back in to OS X.
 
 Run XQuartz in e.g. bash:
 
-```
-open -a XQuartz
-
+```Bash
+$ open -a XQuartz
 ```
 
 In the XQuartz preferences, go to the “Security” tab and make sure you’ve got “Allow connections from network clients” ticked:
@@ -64,14 +67,14 @@ In the XQuartz preferences, go to the “Security” tab and make sure you’ve 
 
 The last work is to allow xhost access to localhost as below:
 
-```
+```Bash
 $ xhost + localhost
 localhost being added to access control list
 ```
 
 After doing this, type `xhost`, you will see the display below, which means the settings is successful:
 
-```
+```bash
 $ xhost
 access control enabled, only authorized clients can connect
 INET:localhost
@@ -95,7 +98,7 @@ after fully installing Xming, open `XLaunch.exe`, follow the default steps until
 ### Initial
 Firstly, you should build `ucore` image and run `ucore-container` container by using
 
-```
+```bash
 $ make init
 ```
 
@@ -107,7 +110,7 @@ use `docker ps` you can see a docker container called `ucore-container`.
 
 You'll use
 
-```
+```Bash
 $ make exec
 ```
 
@@ -120,13 +123,13 @@ By detach the container, just type `exit`. While you want to go back into the co
 
 After `make init`, the `ucore-container` container has been established and will persist until you call `make rm` to remove the container. Even if you shut off your computer, the container is also existed. After your restarting you computer, by attaching the container, you need firstly to start it by using
 
-```
+```Bash
 $ make start
 ```
 
 For stopping the container, just type
 
-```
+```Bash
 $ make stop
 ```
 
@@ -134,7 +137,7 @@ $ make stop
 
 For removing the `ucore-container` to initial a new `ucore-container`, just type
 
-```
+```Bash
 $ make rm
 ```
 
@@ -170,7 +173,7 @@ This error means the container is already in use, there's no need to `make init`
 
 ## Acknowledgements
 
-Thanks for the testing of Cheng Lu and [Yifan Qiao](https://github.com/LegaDyan).
+Thanks for the testing of [Cheng Lu](http://github.com/LuChengTHU) and [Yifan Qiao](https://github.com/LegaDyan).
 
 
 
